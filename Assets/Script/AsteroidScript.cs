@@ -19,6 +19,8 @@ public class AsteroidScript : MonoBehaviour
     public GameObject player;
     public GameObject explosion;
 
+    public GameManager gm;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +33,8 @@ public class AsteroidScript : MonoBehaviour
 
         // find the player
         player = GameObject.FindWithTag("Player");
+        // find game manager
+        gm = GameObject.FindObjectOfType<GameManager>();
         
     }
 
@@ -66,14 +70,20 @@ public class AsteroidScript : MonoBehaviour
                 //Spawn two medium asteroids
                 Instantiate(asteroidMedium, transform.position, transform.rotation);
                 Instantiate(asteroidMedium, transform.position, transform.rotation);
+
+                gm.UpdateNumberOfAsteroids(1);
             }
             else if(asteroidSize == 2) {
                 //Spawn two small asteroids
                 Instantiate(asteroidSmall, transform.position, transform.rotation);
                 Instantiate(asteroidSmall, transform.position, transform.rotation);
+
+                gm.UpdateNumberOfAsteroids(1);
             }
             else if(asteroidSize == 1) {
                 //Remove the asteroid
+
+                gm.UpdateNumberOfAsteroids(-1);
             }
 
             // tell the player to score come points

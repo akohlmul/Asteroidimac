@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FighterControls : MonoBehaviour
 {
 
 	public Rigidbody2D rb;
+    public SpriteRenderer spriteRenderer;
+    public Collider2D collider;
 	public float thrust;
 	public float turnThrust;
 	private float thrustInput;
@@ -17,12 +20,15 @@ public class FighterControls : MonoBehaviour
     public float screenRight;
     public float bulletForce;
     public float deathForce;
+    private bool hyperspace; // true = currently hyperspacing
+    public AlienScript alien;
 
     public int score;
     public int lives;
 
     public Text scoreText;
     public Text livesText;
+    public GameObject gameOverPanel;
 
     public AudioSource audio;
 
@@ -36,7 +42,7 @@ public class FighterControls : MonoBehaviour
     void Start()
     {
         score = 0;
-
+        hyperspace = false;
         scoreText.text = "Score " + score;
         livesText.text = "Lives " + lives;
     }
@@ -54,6 +60,15 @@ public class FighterControls : MonoBehaviour
             GameObject newBullet = Instantiate(bullet, transform.position, transform.rotation);
             newBullet.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.up * bulletForce);
             Destroy(newBullet, 5.0f);
+        }
+
+        //Check for hyperspace
+        if(Input.GetButtonDown("Hyperspace") && !hyperspace) {
+            hyperspace = true;
+            //turn off colliders and spriteRender
+            spriteRenderer.enabled = false;
+            collider.enabled = false;
+            Invoke("Hyperspace",1f);
         }
 
         //rotate the ship
@@ -92,41 +107,71 @@ public class FighterControls : MonoBehaviour
     void Respawn() {
         rb.velocity = Vector2.zero;
         transform.position = Vector2.zero;
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        sr.enabled = true;
-        sr.color = inColor;
+        spriteRenderer.enabled = true;
+        spriteRenderer.color = inColor;
         Invoke("Invunerable", 3f);
     }
 
     void Invunerable() {
-        GetComponent<Collider2D>().enabled = true;
-        GetComponent<SpriteRenderer>().color = normalColor;
+        collider.enabled = true;
+        spriteRenderer.color = normalColor;
+    }
+
+    void Hyperspace() {
+        //Move to a new random position
+        Vector2 newPosition = new Vector2(Random.Range(-3.5f, 3.5f),Random.Range(-2.5f, 2.5f));
+        transform.position = newPosition;
+        //turn on colliders and spriteRender
+        spriteRenderer.enabled = true;
+        collider.enabled = true;
+
+        hyperspace = false;
+    }
+
+    void LoseLife() {
+        lives--;
+        //Make explosion
+        GameObject newExplosion = Instantiate(explosion, transform.position, transform.rotation);
+        Destroy(newExplosion, 3f);
+        livesText.text = "Lives " + lives;
+
+        //Respawn New Life
+        spriteRenderer.enabled = false;
+        collider.enabled = false;
+         Invoke("Respawn", 3f);
+            
+        if(lives <= 0) {
+            GameOver();
+        }
     }
 
     void OnCollisionEnter2D(Collision2D col) {
         Debug.Log(col.relativeVelocity.magnitude);
 
         if(col.relativeVelocity.magnitude > deathForce) {
-            lives--;
-            //make explosion
-            GameObject newExplosion = Instantiate(explosion, transform.position, transform.rotation);
-            Destroy(newExplosion, 3f);
-            livesText.text = "Lives " + lives;
-
-            //Respawn New Life
-            GetComponent<SpriteRenderer>().enabled = false;
-            GetComponent<Collider2D>().enabled = false;
-            Invoke("Respawn", 3f);
-            
-            if(lives <= 0) {
-                GameOver();
-            }
+            LoseLife();
         } else {
             audio.Play ();
         }
     }
 
+    void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Beam")) {
+            LoseLife();
+            alien.Disable();
+        }
+    }
+
     void GameOver() {
         CancelInvoke();
+        gameOverPanel.SetActive(true);
+    }
+
+    public void GoToMainMenu() {
+        SceneManager.LoadScene("Start Menu");
+    }
+
+    public void PlayAgain() {
+        SceneManager.LoadScene("Main");
     }
 }
