@@ -34,4 +34,13 @@ public class GameManager : MonoBehaviour {
         alien.NewLevel();
     }
 
+    public bool CheckForHighScore(int score) {
+        int highScore = PlayerPrefs.GetInt("highscore");
+        if(score > highScore) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

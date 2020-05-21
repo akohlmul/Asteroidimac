@@ -29,6 +29,10 @@ public class FighterControls : MonoBehaviour
     public Text scoreText;
     public Text livesText;
     public GameObject gameOverPanel;
+    public GameObject newHighScorePanel;
+    public InputField highScoreInput;
+    public Text highScoreListText;
+    public GameManager gm;
 
     public AudioSource audio;
 
@@ -164,7 +168,23 @@ public class FighterControls : MonoBehaviour
 
     void GameOver() {
         CancelInvoke();
+        //Tell the game manager to check for high score
+        if(gm.CheckForHighScore(score)) {
+            newHighScorePanel.SetActive(true);
+        } else {
+            gameOverPanel.SetActive(true);
+            highScoreListText.text = "HIGH SCORES" + "\n" + PlayerPrefs.GetString("highscoreName") + " " + PlayerPrefs.GetInt("highscore");
+        }
+    }
+
+    public void HighScoreInput() {
+        string newInput = highScoreInput.text;
+        Debug.Log(newInput);
+        newHighScorePanel.SetActive(false);
         gameOverPanel.SetActive(true);
+        PlayerPrefs.SetString("highscoreName", newInput);
+        PlayerPrefs.SetInt("highscore", score);
+        highScoreListText.text = "HIGH SCORES" + "\n" + PlayerPrefs.GetString("highscoreName") + " " + PlayerPrefs.GetInt("highscore");
     }
 
     public void GoToMainMenu() {
