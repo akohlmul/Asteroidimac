@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//using static System.Math;
 
 public class AlienScript : MonoBehaviour {
 
@@ -55,14 +56,42 @@ public class AlienScript : MonoBehaviour {
         rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
     }
 
+    // NORMAL RANDOM
+    float Normal(float time) {
+        float ecart = 0.2f;
+        for (int i = 0; i < 25; i++) {
+            float random = Random.Range(0f, 10f);      
+            if (random < 5) {
+                time = time + ecart;
+            } else {
+                time = time - ecart;
+            }
+        }
+        return time;
+    }
+
+    // DISCRETE RANDOM VARIABLE
+    int RandomPoints() {
+        float random = Random.Range(0f,10f);
+        if(random > 3) {
+            return 150;
+        } else {
+            return -150;
+        }
+    }
+
     public void NewLevel() {
         Disable();
         currentLevel++;
-        timeBeforeSpawning = Random.Range(5f,20f);
+        // NORMAL RANDOM
+        timeBeforeSpawning = Normal(5);
+        Debug.Log(timeBeforeSpawning);
         Invoke("Enable", timeBeforeSpawning);
         speed = currentLevel / 10f;
         bulletSpeed = 45 + currentLevel;
-        points = 150 * currentLevel;
+        // DISCRETE RANDOM VARIABLE
+        points = RandomPoints() * currentLevel;
+        Debug.Log(RandomPoints());
     }
 
     void Enable() {
