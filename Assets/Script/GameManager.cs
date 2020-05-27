@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
     public int numberOfAsteroids; //This is the current number of asteroids in the scene
     public int levelNumber = 1;
+    public Text levelText;
     public GameObject asteroid;
     public AlienScript alien;
     
@@ -22,6 +24,7 @@ public class GameManager : MonoBehaviour {
 
     void StartNewLevel() {
         levelNumber++;
+        levelText.text = "Level " + levelNumber;
 
         //Spawn new asteroids
         for(int i = 0; i < levelNumber*2; i++) {

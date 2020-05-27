@@ -22,6 +22,7 @@ public class FighterControls : MonoBehaviour
     public float deathForce;
     private bool hyperspace; // true = currently hyperspacing
     public AlienScript alien;
+    //public BulletScript bulletScript;
 
     public int score;
     public int lives;
@@ -41,6 +42,9 @@ public class FighterControls : MonoBehaviour
 
     public Color inColor;
     public Color normalColor;
+
+    public Color color1; //00FFDA
+    public Color color2;
 
     // Start is called before the first frame update
     void Start()
